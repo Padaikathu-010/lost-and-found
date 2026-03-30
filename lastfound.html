@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found | Security Portal</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            width: 420px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border-radius: 20px 20px 0 0;
+        }
+
+        h2 {
+            color: #00d2ff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        textarea { height: 90px; resize: none; }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.4s;
+            margin-top: 20px;
+            color: white;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 210, 255, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .status-msg {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>🛡️ Lost & Found Portal</h2>
+        <form id="lostFoundForm">
+            <input type="text" id="itemName" placeholder="Item Name" required>
+            <textarea id="description" placeholder="Description"></textarea>
+            
+            <select id="status">
+                <option value="lost">Lost Something</option>
+                <option value="found">Found Something</option>
+            </select>
+            
+            <input type="text" id="contactInfo" placeholder="Contact Details" required>
+            <button type="submit">SUBMIT REPORT</button>
+        </form>
+        <div id="msg" class="status-msg"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('lostFoundForm');
+        const msgDiv = document.getElementById('msg');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            msgDiv.style.color = "#00d2ff";
+            msgDiv.innerText = "Processing...";
+            
+            const itemData = {
+                itemName: document.getElementById('itemName').value,
+                description: document.getElementById('description').value,
+                status: document.getElementById('status').value,
+                contactInfo: document.getElementById('contactInfo').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                });
+
+                if (response.ok) {
+                    msgDiv.style.color = "#00ff88";
+                    msgDiv.innerText = "Success!";
+                    form.reset();
+                } else {
+                    msgDiv.style.color = "#ff4444";
+                    msgDiv.innerText = "Failed!";
+                }
+            } catch (error) {
+                msgDiv.style.color = "#ffbb00";
+                msgDiv.innerText = "Backend Offline!";
+            }
+        };
+    </script>
+</body>
+</html>
